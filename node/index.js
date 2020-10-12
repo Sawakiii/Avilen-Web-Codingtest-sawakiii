@@ -12,6 +12,60 @@ const server = http.createServer((req, res)=>{
    }
    if( endpoint==='/api' ){
       // ここに処理を記述してください。  
+      let data = ''
+      req.on('data', function(chunk){
+         let data = JSON.parse(chunk)
+
+         // dataで他のnumで割り切れるものがあれば、FizzBuzz形式に文字を変化させる。
+
+         // console.log(data.obj.reverse())
+         data = data.obj.reverse().map((value, index)=>{
+            for (let i=index+1;i < data.obj.length;i++){
+               if (value.num % data.obj.reverse()[i].num===0){
+                  return { num: value.num, text: value.text + data.obj.reverse()[i].text }
+               }
+            }
+            return {num : value.num, text: value.text}
+         })
+
+         console.log(data)
+         // dataにFizzBuzzの文字達を最小公倍数ごとに追加する。
+         for (let m=0;m < data.obj.length;m++){
+            for (let n=m+1; n < data.obj.length;n++){
+               // 3つ以上のFizzBuzz状態は存在しないため、考慮しない。
+               // 30より上は表示しないので、掛けて30を超えるものはdataにpushしない。
+               if (data.obj[m].num * data.obj[n].num <= 30) {
+                  data.obj.push({
+                     "num": data.obj[m].num * data.obj[n].num,
+                     "text": data.obj[m].text + data.obj[n].text
+                  })
+               }
+            }
+         }
+         console.log(data)
+         
+         // それぞれの倍数ごとにanswerを変化させる。
+         // 1-30の配列を作成し、倍数が出てきた場合に文字化する。
+         let answer = {data: []}
+         for (let i=1;i <=30; i++){
+            // inpは、英字が入力されたかどうかを判定する。
+            let inp = true
+            for (let x=0;x < data.obj.length;x++){
+               if (i % data.obj[x].num === 0) {
+                  inp = false
+                  answer.data.push(data.obj[x].text)   
+               }
+            }
+            if (inp) {
+               answer.data.push(i)
+            }
+         }
+
+         // answerを送信する。
+         req.on('end', ()=>{
+            res.end(JSON.stringify(answer))
+         })
+      })
    }
 });
 server.listen(8080); 
