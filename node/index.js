@@ -12,23 +12,22 @@ const server = http.createServer((req, res)=>{
    }
    if( endpoint==='/api' ){
       // ここに処理を記述してください。  
-      let data = ''
       req.on('data', function(chunk){
          let data = JSON.parse(chunk)
 
          // dataで他のnumで割り切れるものがあれば、FizzBuzz形式に文字を変化させる。
-
-         // console.log(data.obj.reverse())
-         data = data.obj.reverse().map((value, index)=>{
+         dataReverse = data.obj.slice().reverse()
+         data.obj = dataReverse.map((value, index)=>{
             for (let i=index+1;i < data.obj.length;i++){
-               if (value.num % data.obj.reverse()[i].num===0){
-                  return { num: value.num, text: value.text + data.obj.reverse()[i].text }
+               if (value.num % dataReverse[i].num === 0){
+                  return { num: value.num, text: value.text + dataReverse[i].text }
                }
             }
             return {num : value.num, text: value.text}
-         })
+            // numが小さい順にソートする。
+         }).reverse()
 
-         console.log(data)
+         
          // dataにFizzBuzzの文字達を最小公倍数ごとに追加する。
          for (let m=0;m < data.obj.length;m++){
             for (let n=m+1; n < data.obj.length;n++){
@@ -42,7 +41,7 @@ const server = http.createServer((req, res)=>{
                }
             }
          }
-         console.log(data)
+         
          
          // それぞれの倍数ごとにanswerを変化させる。
          // 1-30の配列を作成し、倍数が出てきた場合に文字化する。
@@ -53,11 +52,11 @@ const server = http.createServer((req, res)=>{
             for (let x=0;x < data.obj.length;x++){
                if (i % data.obj[x].num === 0) {
                   inp = false
-                  answer.data.push(data.obj[x].text)   
+                  answer.data[i-1] = data.obj[x].text
                }
             }
             if (inp) {
-               answer.data.push(i)
+               answer.data[i-1] = i
             }
          }
 
